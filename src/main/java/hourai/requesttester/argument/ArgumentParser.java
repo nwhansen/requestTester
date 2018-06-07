@@ -29,8 +29,11 @@ public class ArgumentParser {
                     return position;
                 }
                 ourArgument = argumentString.indexOf(argument.getLongCommand()) == 2;
+                //Validate the length
+                ourArgument &= argumentString.length() - 2 == argument.getLongCommand().length();
             } else if(argument.getShortCommand() != null) {
                 ourArgument =  argumentString.indexOf(argument.getShortCommand()) == 1;
+                ourArgument &= argumentString.length() - 1 == argument.getShortCommand().length();
             }
         } else {
             //If we are positional and it matches ours then yes. 

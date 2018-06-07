@@ -45,15 +45,34 @@ public class Arguments {
         return proxy;
     }
       
-    public static  Argument createWSDL() {
-        Argument wsdl = new Argument();
-        wsdl.setLongCommand("wsdl");
-        wsdl.setParameterCount(2);
-        wsdl.setHelp(createHelpMessage("wsdl",
-                        "Downloads a wsdl and places in this directory for mocking of soap interfaces, it doesn't change the url for services (change before using wsdl)", 
-                        "url", "The URL to download", 
-                        "name", "The filename to create with WSDL"));
-        return wsdl;
+    public static  Argument createDownload() {
+        Argument download = new Argument();
+        download.setLongCommand("download");
+        download.setShortCommand("d");
+        download.setParameterCount(3);
+        download.setHelp(createHelpMessage("download",
+                        "Downloads a file and places the requested http header", 
+                        "response", "The response code",
+                        "name", "The filename to download the page to",
+                        "url", "The URL to download"));
+        return download;
+    }
+    
+    public static Argument createDownloadMIME() {
+        Argument downloadMIME = new Argument();
+        downloadMIME.setLongCommand("mime-type");
+        downloadMIME.setParameterCount(1);
+        downloadMIME.setHelp(createHelpMessage("mime-type", 
+                "Sets the mimetype for a downloaded file, defaults to text/hmtl", 
+                "mime", "the mime type such as text,html,json etc"));
+        return downloadMIME;
+    }
+    
+    public static Argument createMIMEHelp() {
+        Argument helpMIME = new Argument();
+        helpMIME.setLongCommand("help-mime-types");
+        helpMIME.setHelp(createHelpMessage("help-mime-types", "Lists the supported mime types and the exists"));
+        return helpMIME;
     }
     
     public static  Argument createPort() {

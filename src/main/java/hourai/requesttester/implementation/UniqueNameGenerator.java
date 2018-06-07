@@ -13,7 +13,8 @@ public class UniqueNameGenerator {
     private String filename;
     
     public String generateNewFileName() {
-        filename = (System.nanoTime()) + "";
+        //This combo is unlikley to ever collide. (but names are long)
+        filename = (System.currentTimeMillis()) + "-" + (System.nanoTime());
         return filename;
     }
     
