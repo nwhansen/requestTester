@@ -3,6 +3,7 @@
  */
 package hourai.requesttester.implementation.filereader;
 
+import hourai.requesttester.implementation.filefinders.AbstractFileFinder;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import hourai.requesttester.implementation.RequestedFileFinder;
 import hourai.requesttester.interfaces.ResponseGenerator;
 
 /**
@@ -26,9 +26,9 @@ import hourai.requesttester.interfaces.ResponseGenerator;
  * @author nhansen
  */
 public class FileReaderResponseGenerator implements ResponseGenerator {
-
+    private static final Logger LOGGER = Logger.getLogger(FileReaderResponseGenerator.class.getName());
     private BufferedWriter writer;
-    private RequestedFileFinder requestedFileFinder;
+    private final AbstractFileFinder requestedFileFinder;
 
     /**
      * Creates the RepsonseGenerator for a given writer
@@ -36,19 +36,15 @@ public class FileReaderResponseGenerator implements ResponseGenerator {
      * @param writer
      * @param requestedFileFinder 
      */
-    public FileReaderResponseGenerator(BufferedWriter writer, RequestedFileFinder requestedFileFinder) {
+    public FileReaderResponseGenerator(BufferedWriter writer, AbstractFileFinder requestedFileFinder) {
         this.writer = writer;
-        this.requestedFileFinder = requestedFileFinder;
-    }
-
-    public void setRequestedFileFinder(RequestedFileFinder requestedFileFinder) {
         this.requestedFileFinder = requestedFileFinder;
     }
 
     @Override
     public void sendResponse() {
         try {
-            writeResponse(requestedFileFinder.getRequestedFile());
+            writeResponse(requestedFileFinder.getFilename());
         } catch (FileNotFoundException e) {
 
         } catch (IOException e) {
@@ -69,10 +65,6 @@ public class FileReaderResponseGenerator implements ResponseGenerator {
         //Now we want to check if the file exists.
 
         String resolvedFile = requestedFile;
-        if (requestedFile != null) {
-            resolvedFile = processUrlWithParameters(requestedFile);
-        }
-
         if (resolvedFile != null && new File(resolvedFile).exists()) {
             BufferedReader fileReader = new BufferedReader(new FileReader(resolvedFile));
             String currentLine;
@@ -83,6 +75,7 @@ public class FileReaderResponseGenerator implements ResponseGenerator {
                 }
             } catch (IOException e) {
                 //It may be a good idea to do this sadly i don't care enough
+                LOGGER.log(Level.INFO, "Unable to write response of resolved file", e);
             }
         } else {
             // Start sending our reply, using the HTTP 1.1 protocol
@@ -93,21 +86,6 @@ public class FileReaderResponseGenerator implements ResponseGenerator {
         }
     }
 
-    /**
-     * Processes the URL and returns the correctly resolved file.
-     * @param requestedFile the requested file to be loaded
-     * @return The url on disk we can locate
-     */
-    protected String processUrlWithParameters(String requestedFile) {
-        //In here we simple return the part before the ? this is the only strategy i can come up with right now
-        String[] urlPart = requestedFile.split("\\?");
-        if (urlPart != null && urlPart.length > 1) {
-            //We have params
-            Logger.getLogger(ResponseGenerator.class.getName()).log(Level.INFO, String.format("Ignoring url parameters since no logic implemented parameters are: %s", urlPart[1]));
-            return urlPart[0];
-        }
-        return requestedFile;
-    }
 
     public static Map<String, List<String>> getQueryParams(String url) throws UnsupportedEncodingException {
         Map<String, List<String>> params = new HashMap<String, List<String>>();
@@ -147,10 +125,11 @@ public class FileReaderResponseGenerator implements ResponseGenerator {
             try {
                 writer.close();
             } catch (IOException ex) {
-                Logger.getLogger(ResponseGenerator.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         }
         writer = null;
     }
 }
+
 

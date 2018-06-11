@@ -21,6 +21,7 @@ public class MIMEType {
         mimeTypes.put("text", "text/plain");
         mimeTypes.put("html", "text/html");
         mimeTypes.put("json", "application/json");
+	mimeTypes.put("xml", "text/xml");
         mimeHash = Collections.unmodifiableMap(mimeTypes);
     }
     

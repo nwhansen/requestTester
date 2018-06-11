@@ -7,9 +7,11 @@ import java.security.InvalidParameterException;
 
 /**
  * Represents an argument for the command line
+ *
  * @author nhansen
  */
 public class Argument {
+
     private boolean present;
     private boolean positionalRequred;
     private int positional;
@@ -24,19 +26,20 @@ public class Argument {
         positional = -1;
         parameters = new String[0];
     }
-    
+
     /**
      * Returns if the parameter was present in the argument list
-     * @return 
+     *
+     * @return
      */
     public boolean getIsPresent() {
         return present;
     }
-    
-    public void setIsPresent(boolean present){
+
+    public void setIsPresent(boolean present) {
         this.present = present;
     }
-    
+
     /**
      * @return the position the argument could be present in
      */
@@ -48,7 +51,7 @@ public class Argument {
      * @param positional the position that the argument can be in
      */
     public void setPositional(int positional) {
-        if(parameterCount > 1) {
+        if (parameterCount > 1) {
             throw new InvalidParameterException("You cannot set positional and parameter count at the same time");
         }
         this.positional = positional;
@@ -76,7 +79,8 @@ public class Argument {
     }
 
     /**
-     * @param shortCommand the command for this argument usually 1 character long do not include '-'
+     * @param shortCommand the command for this argument usually 1 character
+     * long do not include '-'
      */
     public void setShortCommand(String shortCommand) {
         this.shortCommand = shortCommand;
@@ -90,7 +94,8 @@ public class Argument {
     }
 
     /**
-     * @param longCommand the command that is longer that 1 character, usually prefixed by '--'. Do not include '--'
+     * @param longCommand the command that is longer that 1 character, usually
+     * prefixed by '--'. Do not include '--'
      */
     public void setLongCommand(String longCommand) {
         this.longCommand = longCommand;
@@ -104,11 +109,13 @@ public class Argument {
     }
 
     /**
-     * The Number of parameters, if this is set you cannot also set positional since those are logically exclusive. 
-     * @param parameterCount the number of parameters. 
+     * The Number of parameters, if this is set you cannot also set positional
+     * since those are logically exclusive.
+     *
+     * @param parameterCount the number of parameters.
      */
     public void setParameterCount(int parameterCount) {
-        if(positional > 0) {
+        if (positional > 0) {
             throw new InvalidParameterException("You cannot set positional and parameter count at the same time");
         }
         this.parameterCount = parameterCount;
@@ -122,7 +129,8 @@ public class Argument {
     }
 
     /**
-     * @param parameters the parameters passed in via the command line to this argument
+     * @param parameters the parameters passed in via the command line to this
+     * argument
      */
     public void setParameters(String[] parameters) {
         this.parameters = parameters;
@@ -136,7 +144,8 @@ public class Argument {
     }
 
     /**
-     * @param positionalRequred if the positional must be met (IE we have to have a value at the position 0)
+     * @param positionalRequred if the positional must be met (IE we have to
+     * have a value at the position 0)
      */
     public void setPositionalRequred(boolean positionalRequred) {
         this.positionalRequred = positionalRequred;
@@ -155,7 +164,10 @@ public class Argument {
     public void setHelp(ArgumentHelp help) {
         this.help = help;
     }
-        
+
+    @Override
+    public String toString() {
+        String name = getHelp() != null ? getHelp().getCommandLineName() : "unkown";
+        return String.format("IsPresent: %s Name: %s Value: %s", getIsPresent(), name, getValue());
+    }
 }
-
-

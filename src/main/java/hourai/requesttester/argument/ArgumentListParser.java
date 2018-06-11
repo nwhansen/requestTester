@@ -83,7 +83,7 @@ public class ArgumentListParser {
         } while (parsingPosition != nextPosition && nextPosition < arguments.length);
         if (nextPosition != arguments.length) {
             //We failed to parse all the arguments
-            System.err.println("Unable to parse all arguments");
+            System.err.println("There is additional command line arguments that were not processed, did you miss-type something?");
             System.exit(1024);
         }
     }

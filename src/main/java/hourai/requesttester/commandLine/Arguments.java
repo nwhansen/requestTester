@@ -111,9 +111,19 @@ public class Arguments {
         urlParameterStategy.setParameterCount(1);
         urlParameterStategy.setHelp(createHelpMessage("strategy", "The strategy used to resolve file names when the url has parameters, and not in proxy mode", 
                 "ignore", "[Default] Ignores the parameters and just returns the file on disk",
-                "commandLine", "[Unimplemented] Converts the url parameters in to command line arguments, useful for basic scripting of output"));
+                "underscore", "Converts all windows non-valid characters commonly used in url parameters into underscores, useful for simple testing with url parameters [/\\<>:\"|?*]"));
         
         return urlParameterStategy;
+    }
+    
+    public static Argument createLogLevel() {
+        Argument logLevel = new Argument();
+        logLevel.setLongCommand("logLevel");
+        logLevel.setShortCommand("l");
+        logLevel.setParameterCount(1);
+        logLevel.setHelp(createHelpMessage("loglevel", "The level of logging the application will be using. By default it is off", 
+                "level", "The level using standard log level, info is the most used by the interface. All strings (case insensitive): off, severe, warning, info, config, fine, finer, finest, all"));
+        return logLevel;
     }
 }
 
