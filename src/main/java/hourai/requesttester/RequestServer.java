@@ -48,7 +48,10 @@ public class RequestServer {
             } catch (IOException e) {
                 //If we had a starting port we failed. default to random port
                 // selection
-                startingPort = 0;
+                if(startingPort != 0) {
+                    port = -1;
+                    return;
+                }
             }
         } while (server == null);
     }

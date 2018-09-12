@@ -27,6 +27,7 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.math.BigInteger;
 
 /**
  *
@@ -73,6 +74,8 @@ public class Main {
         //Setup the log level. 
         if (logLevelArgument.getIsPresent() && !"off".equalsIgnoreCase(logLevelArgument.getValue())) {
             setupLogging(logLevelArgument.getValue());
+        } else {
+            setupLogging("off");
         }
         if (helpMIME.getIsPresent()) {
             MIMEType.printAll();
@@ -109,22 +112,27 @@ public class Main {
         }
 
         RequestServer server = new RequestServer(port, responseGenerator);
-        System.out.printf("Starting server on port: %d", server.getPort());
-        if (portArgument.getIsPresent() && server.getPort() !=   port) {
-            System.out.println("SERVER STARTED ON DIFFERNT PORT THAN REQUESTED");
+        if (server.getPort() == -1) {
+            System.out.printf("Unable to start server for requested port %d shutting down", port);
+            System.out.println();
+            return;
         }
+        System.out.printf("Starting server on port: %d", server.getPort());
         System.out.println();
 
         RequestProcessor processor = new RequestProcessor(new RequestFileWriterFactoryImpl(nameGenerator));
         RequestServerConnection connection;
         System.out.println("Awaiting Connection");
+        BigInteger connectionCount = BigInteger.ONE;
         while ((connection = server.getConnection()) != null) {
             System.out.println("Recieved Connection");
             if (callback != null) {
                 connection.getReader().addCallback(callback);
             }
             processor.process(connection);
-            System.out.println("Awaiting Connection");
+            System.out.printf("Awaiting Connection (%s)", connectionCount.toString());
+            System.out.println();
+            connectionCount = connectionCount.add(BigInteger.ONE);
         }
     }
 
