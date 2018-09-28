@@ -30,7 +30,9 @@ public abstract class AbstractFileFinder implements RequestWriteCallback{
         if (filename == null) {
             if (hasVerb(line)) {
                 String[] parts = line.split(" ");
-                processPath(parts[1]);
+				if (parts.length > 2 && parts[1].length() > 1) {
+                    processPath(parts[1]);
+                }
                 if(filename == null) {
                     LOGGER.log(Level.WARNING, String.format("The path: `%s` did not result in a filename", parts[1]));
                     filename = "";

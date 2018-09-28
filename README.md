@@ -11,8 +11,14 @@ To run the application you will need java 1.6 and above.
 
 If you are running an operating system with a SWING compatible UI framework and run the application with no commands it will attempt to launch the UI otherwise the application will start in server mode (no proxy) and selects a random port to use
 
+### Quick Uses:
+Create a server that will write requests and serve files in the same directory  
+`java -jar requestTester.jar -p 8080`  
+Create a proxy that will write requests and forward them, as well as write responses  
+`java -jar requestTester.jar -p 8080 -x https://localhost`
+
 ## Server Mode
-To run the application in server mode you only need to exclude the `--proxy` option. 
+To run the application in server mode you only need to exclude the `--proxy` option. If you have a user interface you must specify a port (to prevent UI from showing)
 
 This mode acts like an HTTP/1.1 webserver. It handles the basic protocol information. This mode will attempt to return a file from disk if the path after `/` is a valid file (This will return ANY file that matches the path)
 
@@ -32,11 +38,35 @@ A couple of important notes about the HTTP/1.1 protocol.
 1. The content-length is not strictly required however it greatly eases the consumer application that you may be testing.
 2. The New Line between Content-length and the response payload is required. However all new lines in the file are automatically converted to the correct `\r\n` to be HTTP compliant. 
 
-### Additional Features 
+### URL Resolution Strategies 
 
-Currently any Uri parameters that are passed are striped from the request and only the Uri part before the `?` are used to resolve the file.
+There is a command line parameter called `--strategy` this is used to control how the application will resolve your files. The default is `ignore` 
 
-This is a feature enhancement to create a method which may "route" the call to a file on disk (something like a bash script, or another executable) which would be responsible for writing to standard out the response. This can allow for a level of capability which makes it questionable if this is the right application
+#### Ignore
+
+Ignore simply removes all characters after the `?` (including the `?`) and resolves the path that is the result. 
+
+This means it will resolve the following paths the same:  
+`http://localhost:13286/test?a=Wizard`  
+`http://localhost:13286/test?a=Muggle`
+
+To the file: `test`
+This is useful for fast and simple tests in which you are less concerned about getting the request data, vs returning a meaningful response.
+
+This will traverse sub folders to attempt to find the file.
+
+#### Underscore
+
+The `underscore` option causes the application to convert the following characters into underscore 
+`/\<>:\"|?*`
+
+This allows you differentiate between requests that have specific url parameters. This does not process the request body in any fashion so form parameters are not added the entire URL is processed by this so a request to:
+
+`http://localhost:13286/folderA/folderB/index.php?testing=1&testing=2&a=b<c`
+
+Would be resolved to the following file  
+`folderA_folderB_index.php_testing=1&testing=2&a=b_c`  
+Of course this has limitations but it provides a fairly easy way to mock more sophisticated systgems.
 
 ## Proxy Mode
 In this mode the application forwards any requests to the passed in URL. It is important to note that while this is technically a poor-mans man in the middle attack. It requires all inbound connections to be HTTP and not HTTPS (HTTPS stripping).  

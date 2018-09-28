@@ -30,7 +30,8 @@ public class StripFileFinder extends AbstractFileFinder {
         if (urlPart != null && urlPart.length > 1) {
             //We have params
             Logger.getLogger(StripFileFinder.class.getName()).log(Level.INFO, String.format("Ignoring url parameters: %s", urlPart[1]));
-            return urlPart[0];
+            //Remove the leading '/'
+            return urlPart[0].substring(1);
         }
         return requestedPath;
     }
