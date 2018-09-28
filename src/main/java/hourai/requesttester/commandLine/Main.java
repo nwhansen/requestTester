@@ -23,7 +23,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -203,7 +202,13 @@ public class Main {
      */
     private static void setupLogging(String levelString) throws SecurityException, IllegalArgumentException {
         Level level = Level.parse(levelString.toUpperCase());
-        Logger root = Logger.getLogger("");
+		Logger root = Logger.getLogger("");
+		Handler[] handlers = root.getHandlers();
+		for (int i = 0; i < handlers.length; i++) {
+			if (handlers[i] instanceof ConsoleHandler) {
+				return;
+			}
+		}
         Handler consoleWriter = new Handler() {
             @Override
             public void publish(LogRecord record)

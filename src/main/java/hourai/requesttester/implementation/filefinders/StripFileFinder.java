@@ -33,7 +33,7 @@ public class StripFileFinder extends AbstractFileFinder {
             //Remove the leading '/'
             return urlPart[0].substring(1);
         }
-        return requestedPath;
+		return requestedPath.substring(1);
     }
 }
 

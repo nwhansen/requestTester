@@ -5,20 +5,20 @@ package hourai.requesttester.gui;
 
 import hourai.requesttester.RequestProcessor;
 import hourai.requesttester.RequestServer;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 import hourai.requesttester.data.RequestServerConnection;
-import hourai.requesttester.implementation.filereader.FileReaderResponseGeneratorFactory;
 import hourai.requesttester.implementation.RequestFileWriterFactoryImpl;
 import hourai.requesttester.implementation.UniqueNameGenerator;
 import hourai.requesttester.implementation.filefinders.FileFinderFactory;
+import hourai.requesttester.implementation.filereader.FileReaderResponseGeneratorFactory;
 import hourai.requesttester.implementation.proxy.ProxyServerResponseGeneratorFactory;
 import hourai.requesttester.interfaces.RequestWriteCallback;
 import hourai.requesttester.interfaces.ResponseGeneratorFactory;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -86,7 +86,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
         jButton1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         logTextArea = new javax.swing.JTextArea();
-        strategyCombo = new javax.swing.JComboBox<String>();
+        strategyCombo = new javax.swing.JComboBox();
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -129,7 +129,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
         logTextArea.setAutoscrolls(false);
         jScrollPane2.setViewportView(logTextArea);
 
-        strategyCombo.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "Ignore", "Underscore" }));
+        strategyCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Ignore", "Underscore" }));
         strategyCombo.setToolTipText("The Strategy to use to find files to serve on disk");
 
         jLabel4.setText("Strategy");
@@ -291,7 +291,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
     private javax.swing.JTextField jTextField2;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTextArea logTextArea;
-    private javax.swing.JComboBox<String> strategyCombo;
+    private javax.swing.JComboBox strategyCombo;
     // End of variables declaration//GEN-END:variables
 
     @Override

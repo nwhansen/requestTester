@@ -9,10 +9,9 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,12 +32,12 @@ public class WebRetriever {
     
     public void setResponseCode(String responseCode) { 
         try {
-            int code = Integer.parseInt(responseCode);
-        } catch(NumberFormatException e) {
+			int code = Integer.parseInt(responseCode);
+			this.responseCode = Integer.toString(code, 10);
+		} catch (NumberFormatException ex) {
             System.out.printf("Response code parameter is not a number %s", responseCode);
             System.exit(1);
-        }
-        this.responseCode = responseCode;
+		}
     }
     public void setResponseType(String responseType) {
         this.responseType = responseType;
@@ -63,14 +62,19 @@ public class WebRetriever {
                 }
             }
         } catch(Exception e) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+			Logger.getLogger(WebRetriever.class.getName()).log(Level.SEVERE, null, e);
             //Exit with a failed code
             System.exit(1);
         }
     }
     private static byte[] getBytes(String string) {
-        return string.getBytes(StandardCharsets.UTF_8);
-    }
+		try {
+			return string.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException ex) {
+			Logger.getLogger(WebRetriever.class.getName()).log(Level.SEVERE, "Unsable to convert string to bytes UTF8", ex);
+			return null;
+		}
+	}
     private void writeContent(FileOutputStream output, byte[]...parts) throws IOException {
         for(byte[] part: parts) {
             output.write(part);
