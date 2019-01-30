@@ -28,18 +28,19 @@ public abstract class AbstractFileFinder implements RequestWriteCallback{
     
 	@Override
     public void recievedLine(String line) {
-        if (filename == null) {
-            if (hasVerb(line)) {
-                String[] parts = line.split(" ");
-				if (parts.length > 2 && parts[1].length() > 1) {
-                    processPath(parts[1]);
-                }
-                if(filename == null) {
-                    LOGGER.log(Level.WARNING, String.format("The path: `%s` did not result in a filename", parts[1]));
-                    filename = "";
-                }
-            }
-        }
+		if (filename != null || !hasVerb(line)) {
+			return;
+		}
+		String[] parts = line.split(" ");
+		if (parts.length > 2 && parts[1].length() > 1) {
+			processPath(parts[1]);
+			if (filename == null) {
+				LOGGER.log(Level.WARNING, String.format("The path: `%s` did not result in a filename", parts[1]));
+				filename = "";
+			}
+		} else {
+			LOGGER.log(Level.WARNING, "Root path attempted to be retrieved, unknown answer to this");
+		}
     }
 
 	@Override

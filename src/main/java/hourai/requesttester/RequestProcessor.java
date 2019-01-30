@@ -3,16 +3,16 @@
  */
 package hourai.requesttester;
 
-import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import hourai.requesttester.data.RequestServerConnection;
-import hourai.requesttester.implementation.RequestFileWriter;
 import hourai.requesttester.interfaces.RequestFileWriterFactory;
+import hourai.requesttester.interfaces.RequestWriteCallback;
 import hourai.requesttester.interfaces.ResponseGenerator;
 
 /**
@@ -40,7 +40,7 @@ public class RequestProcessor {
         Socket socket = connection.getUnderlyingSocket();
         RequestReader input = connection.getReader();
         ResponseGenerator output = connection.getResponseGenerator();
-        RequestFileWriter fileWriter = null;
+		RequestWriteCallback fileWriter = null;
         try {
             fileWriter = fileWriterFactory.create();
             //Add the handler for writing the request file
@@ -53,10 +53,14 @@ public class RequestProcessor {
             Logger.getLogger(RequestProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(RequestProcessor.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if(fileWriter != null) {
-                fileWriter.close();
-            }
+		} finally {
+			if (fileWriter instanceof Closeable) {
+				Closeable close = (Closeable) fileWriter;
+				try {
+					close.close();
+				} catch (IOException ex) {
+				}
+			}
         }
         //Close the streams
         close(socket, input, output);

@@ -15,6 +15,8 @@ import java.util.logging.Logger;
  */
 public class StripFileFinder extends AbstractFileFinder {
 
+	private static final Logger logger = Logger.getLogger(StripFileFinder.class.getName());
+
     public StripFileFinder(String defaultFilename) {
         super(defaultFilename);
     }
@@ -29,11 +31,15 @@ public class StripFileFinder extends AbstractFileFinder {
         String[] urlPart = requestedPath.split("\\?");
         if (urlPart != null && urlPart.length > 1) {
             //We have params
-            Logger.getLogger(StripFileFinder.class.getName()).log(Level.INFO, String.format("Ignoring url parameters: %s", urlPart[1]));
+            logger.log(Level.INFO, String.format("Ignoring url parameters: %s", urlPart[1]));
             //Remove the leading '/'
             return urlPart[0].substring(1);
-        }
-		return requestedPath.substring(1);
+		}
+		String filename = requestedPath.substring(1);
+		if (logger.isLoggable(Level.FINE)) {
+			logger.log(Level.FINE, String.format("Returning filename `%s`", filename));
+		}
+		return filename;
     }
 }
 

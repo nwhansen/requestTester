@@ -13,10 +13,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.net.ssl.SSLSocketFactory;
+
 import hourai.requesttester.RequestReader;
-import hourai.requesttester.implementation.RequestFileWriter;
 import hourai.requesttester.implementation.UniqueNameGenerator;
+import hourai.requesttester.implementation.reader.callbacks.RequestFileWriter;
 import hourai.requesttester.interfaces.RequestWriteCallback;
 import hourai.requesttester.interfaces.ResponseGenerator;
 
@@ -28,17 +30,19 @@ public class ProxyServerResponseGenerator implements ResponseGenerator, RequestW
 
     private final StringBuffer recievedData = new StringBuffer();
     private final BufferedWriter output;
-    private final UniqueNameGenerator nameGenerator;
+	private final UniqueNameGenerator nameGenerator;
+	private final boolean faultTolerant;
     private String urlPrefix;
     private String host;
     private int port;
     private boolean encrypted = false;
-    boolean parsedRequest = false;
+	boolean parsedRequest = false;
     RequestWriteCallback proxyWriteCallback;
     
-    public ProxyServerResponseGenerator(BufferedWriter output, String url, UniqueNameGenerator nameGenerator) {
+	public ProxyServerResponseGenerator(BufferedWriter output, String url, UniqueNameGenerator nameGenerator, boolean faultTolerant) {
         this.output = output;
-        this.nameGenerator = nameGenerator;
+		this.nameGenerator = nameGenerator;
+		this.faultTolerant = faultTolerant;
         parseUrl(url);
     } 
     
@@ -105,7 +109,7 @@ public class ProxyServerResponseGenerator implements ResponseGenerator, RequestW
             out.flush();
             recievedData.setLength(0);
             //Now we need to basically read the response from the server. 
-            RequestReader reader = new RequestReader(in); 
+            RequestReader reader = new RequestReader(in, faultTolerant);
             RequestFileWriter serverResponsewriter = new RequestFileWriter(new PrintWriter(nameGenerator.getLastFileName() + ".response"));
             reader.addCallback(serverResponsewriter);
             reader.addCallback(this);
@@ -118,7 +122,7 @@ public class ProxyServerResponseGenerator implements ResponseGenerator, RequestW
             serverResponsewriter.close();
             out.close();
             in.close();
-        } catch (Exception ex) {
+		} catch (Exception ex) {
             if(remote != null) {
                 try {
                     remote.close();

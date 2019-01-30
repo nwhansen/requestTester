@@ -4,7 +4,8 @@
 
   <groupId>hourai</groupId>
   <artifactId>RequestTester</artifactId>
-  <version>1.0.1</version>
+  <description>A tool used to provide simplified and rapid web services testing</description>
+  <version>1.2.0</version>
   <packaging>jar</packaging>
 
   <name>RequestTester</name>
@@ -15,9 +16,83 @@
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
   </properties>
-
   <dependencies>
+	  <dependency>
+		  <groupId>junit</groupId>
+		  <artifactId>junit</artifactId>
+		  <version>4.12</version>
+		  <scope>test</scope>
+	  </dependency>
   </dependencies>
+  <profiles>
+	  <profile>
+		  <!-- Creates an EXE for windows applications (makes usage much simpler) -->
+		  <id>windows-exe</id>
+		  <properties>
+			  <windows.version>${project.version}.0</windows.version>
+		  </properties>
+		  <build>
+			  <plugins>
+				  <plugin>
+					  <groupId>org.codehaus.mojo</groupId>
+					  <artifactId>build-helper-maven-plugin</artifactId>
+					  <version>1.12</version>
+					  <executions>
+						  <execution>
+							  <id>timestamp-property</id>
+							  <goals>
+								  <goal>timestamp-property</goal>
+							  </goals>
+							  <phase>validate</phase>
+							  <configuration>
+								  <name>current.year</name>
+								  <pattern>yyyy</pattern>
+							  </configuration>
+						  </execution>
+					  </executions>
+				  </plugin>
+				  <plugin>
+					  <groupId>com.akathist.maven.plugins.launch4j</groupId>
+					  <artifactId>launch4j-maven-plugin</artifactId>
+					  <executions>
+						  <execution>
+							  <id>l4j-clui</id>
+							  <phase>package</phase>
+							  <goals>
+								  <goal>launch4j</goal>
+							  </goals>
+							  <configuration>
+								  <headerType>console</headerType>
+								  <errTitle>${project.artifactId}</errTitle>
+								  <!--
+								  <classPath>
+									  <mainClass>com.akathist.encc.Clui</mainClass>
+									  <addDependencies>false</addDependencies>
+									  <preCp>anything</preCp>
+								  </classPath>
+								  -->
+								  <jre>
+									  <minVersion>1.6.0</minVersion>
+								  </jre>
+								  <versionInfo>
+									  <fileVersion>${windows.version}</fileVersion>
+									  <txtFileVersion>${windows.version}</txtFileVersion>
+									  <fileDescription>${project.description}</fileDescription>
+									  <copyright>Copyright ${current.year}</copyright>
+									  <productVersion>${windows.version}</productVersion>
+									  <txtProductVersion>${windows.version}</txtProductVersion>
+									  <productName>${project.artifactId}</productName>
+									  <internalName>${project.build.finalName}</internalName>
+									  <originalFilename>${project.build.finalName}.exe</originalFilename>
+								  </versionInfo>
+							  </configuration>
+						  </execution>
+					  </executions>
+				  </plugin>
+			  </plugins>
+		  </build>
+	  </profile>
+  </profiles>
   <build>
       <plugins>
           <plugin>
@@ -32,6 +107,18 @@
                   </archive>
               </configuration>
           </plugin>
+		 <plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-shade-plugin</artifactId>
+			  <executions>
+				  <execution>
+					  <phase>package</phase>
+					  <goals>
+						  <goal>shade</goal>
+					  </goals>
+				  </execution>
+			  </executions>
+		  </plugin>
       </plugins>      
   </build>
 </project>

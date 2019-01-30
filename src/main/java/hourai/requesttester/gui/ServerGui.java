@@ -3,22 +3,24 @@
  */
 package hourai.requesttester.gui;
 
-import hourai.requesttester.RequestProcessor;
-import hourai.requesttester.RequestServer;
-import hourai.requesttester.data.RequestServerConnection;
-import hourai.requesttester.implementation.RequestFileWriterFactoryImpl;
-import hourai.requesttester.implementation.UniqueNameGenerator;
-import hourai.requesttester.implementation.filefinders.FileFinderFactory;
-import hourai.requesttester.implementation.filereader.FileReaderResponseGeneratorFactory;
-import hourai.requesttester.implementation.proxy.ProxyServerResponseGeneratorFactory;
-import hourai.requesttester.interfaces.RequestWriteCallback;
-import hourai.requesttester.interfaces.ResponseGeneratorFactory;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.SwingUtilities;
+
+import hourai.requesttester.RequestProcessor;
+import hourai.requesttester.RequestServer;
+import hourai.requesttester.data.RequestServerConnection;
+import hourai.requesttester.implementation.UniqueNameGenerator;
+import hourai.requesttester.implementation.factories.FileFinderFactory;
+import hourai.requesttester.implementation.factories.FileReaderResponseGeneratorFactory;
+import hourai.requesttester.implementation.factories.ProxyServerResponseGeneratorFactory;
+import hourai.requesttester.implementation.factories.RequestFileWriterFactoryImpl;
+import hourai.requesttester.interfaces.RequestWriteCallback;
+import hourai.requesttester.interfaces.ResponseGeneratorFactory;
 
 /**
  *
@@ -30,6 +32,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
     private boolean ignoreContent = false;
     private boolean recievedNewLine = false;
     private CountDownLatch awaitWindow = null;
+	private boolean tolerantServer = true;
 
     private void setCountDown(CountDownLatch awaitWindow) {
         this.awaitWindow = awaitWindow;
@@ -88,6 +91,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
         logTextArea = new javax.swing.JTextArea();
         strategyCombo = new javax.swing.JComboBox();
         jLabel4 = new javax.swing.JLabel();
+        tolerantServerButton = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -134,6 +138,14 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
 
         jLabel4.setText("Strategy");
 
+        tolerantServerButton.setSelected(true);
+        tolerantServerButton.setText("Tolerant Server");
+        tolerantServerButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enableDisableTolerantServer(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -146,7 +158,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 112, Short.MAX_VALUE)
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(strategyCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -160,7 +172,10 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
                         .addComponent(jTextField2))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(tolerantServerButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -175,13 +190,15 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
                     .addComponent(strategyCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tolerantServerButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jTextField2)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -197,8 +214,9 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
             jTextField2.setEditable(false);
             jTextField1.setEditable(false);
             strategyCombo.setEditable(false);
+			tolerantServerButton.setEnabled(false);
             if (!"".equals(jTextField2.getText())) {
-                responseFactory = new ProxyServerResponseGeneratorFactory(jTextField2.getText(), sharedGenerator, this);
+                responseFactory = new ProxyServerResponseGeneratorFactory(jTextField2.getText(), sharedGenerator, this, tolerantServer);
             } else {
                 FileFinderFactory.Method method = strategyCombo.getSelectedItem().equals("Ignore") ? FileFinderFactory.Method.Strip : FileFinderFactory.Method.Underscore;
                 responseFactory = new FileReaderResponseGeneratorFactory(new FileFinderFactory(null, method));
@@ -219,7 +237,8 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
                 Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
             }
             jTextField2.setEditable(true);
-            strategyCombo.setEditable(true);
+			strategyCombo.setEditable(true);
+			tolerantServerButton.setEnabled(true);
             jTextField1.setEditable(true);
             logTextArea.append("Server stopped\n");
         }
@@ -234,6 +253,11 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
             awaitWindow.countDown();
         }
     }//GEN-LAST:event_formWindowClosed
+
+    private void enableDisableTolerantServer(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableDisableTolerantServer
+		// TODO add your handling code here:
+		tolerantServer = !tolerantServer;
+    }//GEN-LAST:event_enableDisableTolerantServer
 
     public static void StartApplication(boolean await) {
         /* Set the Nimbus look and feel */
@@ -292,6 +316,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTextArea logTextArea;
     private javax.swing.JComboBox strategyCombo;
+    private javax.swing.JToggleButton tolerantServerButton;
     // End of variables declaration//GEN-END:variables
 
     @Override

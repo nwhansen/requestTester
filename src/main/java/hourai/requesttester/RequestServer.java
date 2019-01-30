@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
+
 import hourai.requesttester.data.RequestServerConnection;
 import hourai.requesttester.interfaces.ResponseGeneratorFactory;
 
@@ -21,7 +22,8 @@ import hourai.requesttester.interfaces.ResponseGeneratorFactory;
  */
 public class RequestServer {
 
-    private int port;
+	private int port;
+	private final boolean faultTolerant; //I think
     private ServerSocket server;
     private final ResponseGeneratorFactory responseFactory;
 
@@ -32,9 +34,10 @@ public class RequestServer {
      *
      * @param startingPort The port you want to start the server on
      * @param responseFactory The factory to create response generators
-     */
-    public RequestServer(int startingPort, ResponseGeneratorFactory responseFactory) {
-        server = null;
+	 */
+	public RequestServer(int startingPort, ResponseGeneratorFactory responseFactory) {
+		server = null;
+		this.faultTolerant = false;
         port = startingPort;
         this.responseFactory = responseFactory;
         Random rand = new Random();
@@ -74,7 +77,7 @@ public class RequestServer {
             Socket clientSocket = server.accept();
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-            RequestReader reader = new RequestReader(in);
+			RequestReader reader = new RequestReader(in, faultTolerant);
             return new RequestServerConnection(responseFactory.createResponseGenerator(out, reader), reader, clientSocket);
         } catch (IOException e) {
             return null;

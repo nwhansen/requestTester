@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import hourai.requesttester.interfaces.RequestWriteCallback;
 
 /**
@@ -15,12 +16,13 @@ import hourai.requesttester.interfaces.RequestWriteCallback;
  * @author nhansen
  */
 public class RequestReader {
-    
+	private final boolean faultTolerant;
     private final LinkedList<RequestWriteCallback> listeners = new LinkedList<RequestWriteCallback>();
     BufferedReader reader;
 
-    public RequestReader(BufferedReader reader) {
-        this.reader = reader;
+	public RequestReader(BufferedReader reader, boolean faultTolerant) {
+		this.reader = reader;
+		this.faultTolerant = faultTolerant;
     }
        
     
@@ -71,7 +73,12 @@ public class RequestReader {
                 reader.readLine();
                 notifyLine("");
             } while(true);
-        }
+		} else if (faultTolerant) {
+			try {
+				readCharactersUntilDie();
+			} catch (IOException ex) {
+			}
+		}
     }
 
     private void readCharacters(long contentLength) throws IOException {
@@ -81,7 +88,14 @@ public class RequestReader {
             notifyChar((char)c);
         }
     }
-    
+
+	private void readCharactersUntilDie() throws IOException {
+		int c = -1;
+		while ((c = reader.read()) != -1) {
+			notifyChar((char) c);
+		}
+	}
+
     public void close() {
         if(reader != null){
             try {

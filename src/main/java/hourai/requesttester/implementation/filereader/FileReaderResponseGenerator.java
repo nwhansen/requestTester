@@ -3,7 +3,6 @@
  */
 package hourai.requesttester.implementation.filereader;
 
-import hourai.requesttester.implementation.filefinders.AbstractFileFinder;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import hourai.requesttester.implementation.filefinders.AbstractFileFinder;
 import hourai.requesttester.interfaces.ResponseGenerator;
 
 /**
@@ -27,7 +28,7 @@ import hourai.requesttester.interfaces.ResponseGenerator;
  */
 public class FileReaderResponseGenerator implements ResponseGenerator {
     private static final Logger LOGGER = Logger.getLogger(FileReaderResponseGenerator.class.getName());
-    private BufferedWriter writer;
+	private final BufferedWriter writer;
     private final AbstractFileFinder requestedFileFinder;
 
     /**
@@ -45,10 +46,8 @@ public class FileReaderResponseGenerator implements ResponseGenerator {
     public void sendResponse() {
         try {
             writeResponse(requestedFileFinder.getFilename());
-        } catch (FileNotFoundException e) {
-
-        } catch (IOException e) {
-
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, "Unable to read response file", e);
         }
     }
 
@@ -75,7 +74,7 @@ public class FileReaderResponseGenerator implements ResponseGenerator {
                 }
             } catch (IOException e) {
                 //It may be a good idea to do this sadly i don't care enough
-                LOGGER.log(Level.INFO, "Unable to write response of resolved file", e);
+                LOGGER.log(Level.SEVERE, "Unable to write response of resolved file", e);
             }
         } else {
             // Start sending our reply, using the HTTP 1.1 protocol
@@ -127,8 +126,7 @@ public class FileReaderResponseGenerator implements ResponseGenerator {
             } catch (IOException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
-        }
-        writer = null;
+		}
     }
 }
 

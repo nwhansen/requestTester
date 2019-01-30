@@ -5,6 +5,7 @@
 package hourai.requesttester.data;
 
 import java.net.Socket;
+
 import hourai.requesttester.RequestReader;
 import hourai.requesttester.interfaces.ResponseGenerator;
 
@@ -15,7 +16,7 @@ import hourai.requesttester.interfaces.ResponseGenerator;
 public class RequestServerConnection {
     private final ResponseGenerator responseGenerator; 
     private final RequestReader reader;
-    private Socket socket;
+	private final Socket socket;
     
     /**
      * Creates the request server connection
