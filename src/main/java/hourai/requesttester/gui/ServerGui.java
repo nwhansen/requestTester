@@ -17,8 +17,10 @@ import hourai.requesttester.data.RequestServerConnection;
 import hourai.requesttester.implementation.UniqueNameGenerator;
 import hourai.requesttester.implementation.factories.FileFinderFactory;
 import hourai.requesttester.implementation.factories.FileReaderResponseGeneratorFactory;
+import hourai.requesttester.implementation.factories.PassthroughFileWriterFactoryImpl;
 import hourai.requesttester.implementation.factories.ProxyServerResponseGeneratorFactory;
 import hourai.requesttester.implementation.factories.RequestFileWriterFactoryImpl;
+import hourai.requesttester.interfaces.RequestFileWriterFactory;
 import hourai.requesttester.interfaces.RequestWriteCallback;
 import hourai.requesttester.interfaces.ResponseGeneratorFactory;
 
@@ -32,7 +34,8 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
     private boolean ignoreContent = false;
     private boolean recievedNewLine = false;
     private CountDownLatch awaitWindow = null;
-	private boolean tolerantServer = true;
+    private boolean tolerantServer = true;
+    private final PassthroughFileWriterFactoryImpl noFiles = new PassthroughFileWriterFactoryImpl();
 
     private void setCountDown(CountDownLatch awaitWindow) {
         this.awaitWindow = awaitWindow;
@@ -80,11 +83,11 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTextField1 = new javax.swing.JTextField();
+        portNumberText = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jToggleButton1 = new javax.swing.JToggleButton();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        proxyDestinationText = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -92,6 +95,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
         strategyCombo = new javax.swing.JComboBox();
         jLabel4 = new javax.swing.JLabel();
         tolerantServerButton = new javax.swing.JToggleButton();
+        createFilesToggle = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -100,8 +104,8 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
             }
         });
 
-        jTextField1.setText("13286");
-        jTextField1.setToolTipText("The port the service should run on. Connect to this application by using http://localhost:<port>\nOr http://<thisComputerIP>:<port>");
+        portNumberText.setText("13286");
+        portNumberText.setToolTipText("The port the service should run on. Connect to this application by using http://localhost:<port>\nOr http://<thisComputerIP>:<port>");
 
         jLabel1.setText("Listening Port");
 
@@ -114,7 +118,7 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
 
         jLabel2.setText("Proxy Destination");
 
-        jTextField2.setToolTipText("Populate this to forward messages to another server. Requests will still be written to the log and disk. Reponses will be as well. ");
+        proxyDestinationText.setToolTipText("Populate this to forward messages to another server. Requests will still be written to the log and disk. Reponses will be as well. ");
 
         jLabel3.setText("Log");
 
@@ -146,6 +150,9 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
             }
         });
 
+        createFilesToggle.setSelected(true);
+        createFilesToggle.setText("Create Files");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -157,8 +164,8 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 112, Short.MAX_VALUE)
+                        .addComponent(portNumberText, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(strategyCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -166,16 +173,19 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jToggleButton1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField2))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(tolerantServerButton)))
+                        .addComponent(createFilesToggle)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tolerantServerButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(proxyDestinationText, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -184,16 +194,18 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1)
+                    .addComponent(portNumberText)
                     .addComponent(jToggleButton1)
                     .addComponent(jButton1)
                     .addComponent(strategyCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tolerantServerButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tolerantServerButton)
+                    .addComponent(createFilesToggle))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField2)
+                    .addComponent(proxyDestinationText)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
@@ -207,16 +219,17 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         if (jToggleButton1.isSelected()) {
-            int port = Integer.parseInt(jTextField1.getText());
+            int port = Integer.parseInt(portNumberText.getText());
             logTextArea.append("\n");
             ResponseGeneratorFactory responseFactory;
             UniqueNameGenerator sharedGenerator = new UniqueNameGenerator();
-            jTextField2.setEditable(false);
-            jTextField1.setEditable(false);
+            proxyDestinationText.setEditable(false);
+            portNumberText.setEditable(false);
             strategyCombo.setEditable(false);
-			tolerantServerButton.setEnabled(false);
-            if (!"".equals(jTextField2.getText())) {
-                responseFactory = new ProxyServerResponseGeneratorFactory(jTextField2.getText(), sharedGenerator, this, tolerantServer);
+            createFilesToggle.setEnabled(false);
+            tolerantServerButton.setEnabled(false);
+            if (!"".equals(proxyDestinationText.getText())) {
+                responseFactory = new ProxyServerResponseGeneratorFactory(proxyDestinationText.getText(), sharedGenerator, this, tolerantServer);
             } else {
                 FileFinderFactory.Method method = strategyCombo.getSelectedItem().equals("Ignore") ? FileFinderFactory.Method.Strip : FileFinderFactory.Method.Underscore;
                 responseFactory = new FileReaderResponseGeneratorFactory(new FileFinderFactory(null, method));
@@ -227,7 +240,12 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
             if (port != server.getPort()) {
                 logTextArea.append("SERVER STARTED ON A DIFFERENT PORT\n");
             }
-            Thread serverThread = new Thread(new ServerThread(server, this, new RequestProcessor(new RequestFileWriterFactoryImpl(sharedGenerator))));
+            //If the create files is enabled use it
+            RequestFileWriterFactory fileFactory = noFiles;
+            if(createFilesToggle.isSelected()) {
+                fileFactory = new RequestFileWriterFactoryImpl(sharedGenerator);
+            }
+            Thread serverThread = new Thread(new ServerThread(server, this, new RequestProcessor(fileFactory)));
             serverThread.setName("ServerThread-" + port);
             serverThread.start();
         } else {
@@ -236,10 +254,11 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
             } catch (IOException ex) {
                 Logger.getLogger(ServerGui.class.getName()).log(Level.SEVERE, null, ex);
             }
-            jTextField2.setEditable(true);
+            proxyDestinationText.setEditable(true);
 			strategyCombo.setEditable(true);
 			tolerantServerButton.setEnabled(true);
-            jTextField1.setEditable(true);
+            portNumberText.setEditable(true);
+            createFilesToggle.setEnabled(true);
             logTextArea.append("Server stopped\n");
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
@@ -305,16 +324,17 @@ public class ServerGui extends javax.swing.JFrame implements RequestWriteCallbac
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton createFilesToggle;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTextArea logTextArea;
+    private javax.swing.JTextField portNumberText;
+    private javax.swing.JTextField proxyDestinationText;
     private javax.swing.JComboBox strategyCombo;
     private javax.swing.JToggleButton tolerantServerButton;
     // End of variables declaration//GEN-END:variables
