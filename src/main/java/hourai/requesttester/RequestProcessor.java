@@ -16,23 +16,29 @@ import hourai.requesttester.interfaces.RequestWriteCallback;
 import hourai.requesttester.interfaces.ResponseGenerator;
 
 /**
- * A class that encapsulates the logic required to process a request. Coordinates the logic for 
+ * A class that encapsulates the logic required to process a request.
+ * Coordinates the logic for
+ *
  * @author nhansen
  */
 public class RequestProcessor {
-    
+
     private final RequestFileWriterFactory fileWriterFactory;
-    
+
     /**
      * Creates the request processor to a message logic
-     * @param fileWriterFactory The fileWriter factory to be used to dump requests
+     *
+     * @param fileWriterFactory The fileWriter factory to be used to dump
+     * requests
      */
     public RequestProcessor(RequestFileWriterFactory fileWriterFactory) {
         this.fileWriterFactory = fileWriterFactory;
     }
-    
+
     /**
-     * Processes the request calling the callback. The connection is no longer valid past this request 
+     * Processes the request calling the callback. The connection is no longer
+     * valid past this request
+     *
      * @param connection The connection information
      */
     public void process(RequestServerConnection connection) {
@@ -40,7 +46,7 @@ public class RequestProcessor {
         Socket socket = connection.getUnderlyingSocket();
         RequestReader input = connection.getReader();
         ResponseGenerator output = connection.getResponseGenerator();
-		RequestWriteCallback fileWriter = null;
+        RequestWriteCallback fileWriter = null;
         try {
             fileWriter = fileWriterFactory.create();
             //Add the handler for writing the request file
@@ -53,20 +59,19 @@ public class RequestProcessor {
             Logger.getLogger(RequestProcessor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(RequestProcessor.class.getName()).log(Level.SEVERE, null, ex);
-		} finally {
-			if (fileWriter instanceof Closeable) {
-				Closeable close = (Closeable) fileWriter;
-				try {
-					close.close();
-				} catch (IOException ex) {
-				}
-			}
+        } finally {
+            if (fileWriter instanceof Closeable) {
+                Closeable close = (Closeable) fileWriter;
+                try {
+                    close.close();
+                } catch (IOException ex) {
+                }
+            }
         }
         //Close the streams
         close(socket, input, output);
     }
-    
-    
+
     private void close(Socket socket, RequestReader input, ResponseGenerator output) {
         //Close the sockets properly
         output.close();
@@ -80,7 +85,3 @@ public class RequestProcessor {
         }
     }
 }
-
-
-
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Nathan Hansen. ALL RIGHTS RESERVED
+ * Copyright 2018 Nathan Hansen. No warrenty implicit or explicit is given.
  */
 package hourai.argumentparser.help;
 

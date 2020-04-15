@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright of Nathan Hansen 2018, No warrenty implicit or explicit is given.
  */
 package hourai.requesttester.commandline;
 
@@ -20,35 +18,39 @@ import java.util.logging.Logger;
  * @author nhansen
  */
 public class WebRetriever {
+
     private static final byte[] newLineBytes = getBytes("\r\n");
     private static final byte[] requestHeader = getBytes("HTTP/1.1 ");
     private static final byte[] contentTypeHeader = getBytes("Content-Type: ");
     private static final byte[] contentLengthHeader = getBytes("Content-Length: ");
     private String responseCode = "200";
     private String responseType = "text/html";
+
     public WebRetriever() {
-        
+
     }
-    
-    public void setResponseCode(String responseCode) { 
+
+    public void setResponseCode(String responseCode) {
         try {
-			int code = Integer.parseInt(responseCode);
-			this.responseCode = Integer.toString(code, 10);
-		} catch (NumberFormatException ex) {
+            int code = Integer.parseInt(responseCode);
+            this.responseCode = Integer.toString(code, 10);
+        } catch (NumberFormatException ex) {
             System.out.printf("Response code parameter is not a number %s", responseCode);
             System.exit(1);
-		}
+        }
     }
+
     public void setResponseType(String responseType) {
         this.responseType = responseType;
     }
+
     public void download(String filename, String url) {
         try {
             //Get the content
             final byte[] websiteText = getBytes(getText(url));
             FileOutputStream outputFile = null;
             try {
-                outputFile = new FileOutputStream(filename); 
+                outputFile = new FileOutputStream(filename);
                 writeContent(outputFile, requestHeader, getBytes(responseCode), newLineBytes);
                 writeContent(outputFile, contentTypeHeader, getBytes(responseType), newLineBytes);
                 //Get the bytes to write
@@ -61,26 +63,28 @@ public class WebRetriever {
                     outputFile.close();
                 }
             }
-        } catch(Exception e) {
-			Logger.getLogger(WebRetriever.class.getName()).log(Level.SEVERE, null, e);
+        } catch (Exception e) {
+            Logger.getLogger(WebRetriever.class.getName()).log(Level.SEVERE, null, e);
             //Exit with a failed code
             System.exit(1);
         }
     }
+
     private static byte[] getBytes(String string) {
-		try {
-			return string.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException ex) {
-			Logger.getLogger(WebRetriever.class.getName()).log(Level.SEVERE, "Unsable to convert string to bytes UTF8", ex);
-			return null;
-		}
-	}
-    private void writeContent(FileOutputStream output, byte[]...parts) throws IOException {
-        for(byte[] part: parts) {
+        try {
+            return string.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(WebRetriever.class.getName()).log(Level.SEVERE, "Unsable to convert string to bytes UTF8", ex);
+            return null;
+        }
+    }
+
+    private void writeContent(FileOutputStream output, byte[]... parts) throws IOException {
+        for (byte[] part : parts) {
             output.write(part);
         }
     }
-        
+
     public static String getText(String url) throws Exception {
         URL website = new URL(url);
         URLConnection connection = website.openConnection();
