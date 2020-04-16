@@ -87,7 +87,7 @@ public class Main {
 		if (ArgumentData.proxyArgument.getIsPresent()) {
 			responseGenerator = new ProxyServerResponseGeneratorFactory(ArgumentData.proxyArgument.getValue(), nameGenerator, callback, ArgumentData.tolerantProxy.getIsPresent());
 		} else {
-			responseGenerator = createResponseGenerator(ArgumentData.strategyArgument);
+			responseGenerator = createResponseGenerator(ArgumentData.strategyArgument, ArgumentData.emptyFileName);
 		}
 
 		RequestServer server = new RequestServer(port, responseGenerator);
@@ -120,17 +120,20 @@ public class Main {
 		}
 	}
 
-	private static ResponseGeneratorFactory createResponseGenerator(CommandLineArgument strategyArgument) {
+	private static ResponseGeneratorFactory createResponseGenerator(CommandLineArgument strategyArgument, CommandLineArgument emptyFileName) {
 		ResponseGeneratorFactory responseGenerator;
 		FileFinderFactory finderFactory;
+                String fileName = emptyFileName.getIsPresent() ? emptyFileName.getValue() : null;
+                if(fileName != null && fileName.isEmpty())
+                    fileName = null;
 		if (strategyArgument.getIsPresent()) {
 			if (strategyArgument.getValue().equalsIgnoreCase("underscore")) {
-				finderFactory = new FileFinderFactory(null, FileFinderFactory.Method.Underscore);
+				finderFactory = new FileFinderFactory(fileName, FileFinderFactory.Method.Underscore);
 			} else {
-				finderFactory = new FileFinderFactory(null, FileFinderFactory.Method.Strip);
+				finderFactory = new FileFinderFactory(fileName, FileFinderFactory.Method.Strip);
 			}
 		} else {
-			finderFactory = new FileFinderFactory(null, FileFinderFactory.Method.Strip);
+			finderFactory = new FileFinderFactory(fileName, FileFinderFactory.Method.Strip);
 		}
 		responseGenerator = new FileReaderResponseGeneratorFactory(finderFactory);
 		return responseGenerator;

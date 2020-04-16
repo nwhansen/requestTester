@@ -48,8 +48,8 @@ public abstract class AbstractFileFinder implements RequestWriteCallback{
     
     protected abstract void processPath(String path);
     
-    public String getFilename() {
-        if("".equals(filename)) {
+    public final String getFilename() {
+        if("".equals(filename) || filename == null) {
             return defaultFilename;
         }
         return filename;

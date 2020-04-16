@@ -25,6 +25,7 @@ public class ArgumentData {
     public static CommandLineArgument proxyArgument;
     public static CommandLineArgument strategyArgument;
     public static CommandLineArgument logLevelArgument;
+    public static CommandLineArgument emptyFileName;
     //public static CommandLineArgument helpSubTypeArgument;
     public static CommandLineArgument noRequestFiles;
     public static CommandLineArgument tolerantProxy;
@@ -100,6 +101,11 @@ public class ArgumentData {
         noRequestFiles = builder.addArgument("no-files")
                 .setHelpText("Disables writing of files")
                 .setLongCommand("no-files")
+                .create();
+        emptyFileName = builder.addArgument("empty-file")
+                .setHelpText("What file should be returned when requesting an empty path '/'")
+                .setLongCommand("empty-file")
+                .appendParameter("file name", "The file name to return")
                 .create();
         arguments = builder.createArgumentList();
         return builder.createParser();
