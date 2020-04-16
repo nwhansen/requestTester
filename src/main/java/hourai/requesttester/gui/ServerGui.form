@@ -45,6 +45,10 @@
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="emptyFilePath" min="-2" pref="102" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="createFilesToggle" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="tolerantServerButton" min="-2" max="-2" attributes="0"/>
@@ -81,6 +85,8 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="tolerantServerButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="createFilesToggle" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="emptyFilePath" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -188,6 +194,13 @@
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Create Files"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="emptyFilePath">
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel5">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Empty Path File"/>
       </Properties>
     </Component>
   </SubComponents>
